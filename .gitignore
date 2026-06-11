@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Next.js and frontend builds
+.next/
+out/
+dist/
+build/
+coverage/
+.turbo/
+.vercel/
+
+# Go build and test artifacts
+*.test
+*.out
+*.prof
+*.cover
+coverage.out
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Local config and caches
+.cache/
+.tmp/
+tmp/
+temp/
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS metadata
+._*
+
+# Database and runtime data
+*.sqlite
+*.sqlite3
+*.db
+data/
+
+# Docker and deployment local overrides
+docker-compose.override.yml
