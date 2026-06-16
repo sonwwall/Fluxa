@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 vendor/
+.pnpm-store/
 
 # Next.js and frontend builds
 .next/
@@ -17,6 +18,7 @@ coverage/
 *.prof
 *.cover
 coverage.out
+tsconfig.tsbuildinfo
 
 # Logs
 logs/
