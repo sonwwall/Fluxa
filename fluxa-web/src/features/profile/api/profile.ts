@@ -1,0 +1,1 @@
+export { getAuthorProfile } from "./mock";
