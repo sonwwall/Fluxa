@@ -2,7 +2,9 @@
 
 import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+
+import { MarkdownPreview } from "@/features/articles/components/markdown-preview";
 
 import {
   deleteAuthorArticle,
@@ -29,18 +31,13 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
   const [tagInput, setTagInput] = useState(draft.tags.join(", "));
   const [articleId, setArticleId] = useState(draft.id);
   const [status, setStatus] = useState(draft.status);
+  const [editorMode, setEditorMode] = useState(mode);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const preview = useMemo(() => {
-    return content
-      .split("\n")
-      .filter((line) => line.trim())
-      .slice(0, 8);
-  }, [content]);
-
-  const titleLabel = mode === "create" ? "New Article" : "Edit Article";
+  const titleLabel = editorMode === "create" ? "New Article" : "Edit Article";
   const canSave = Boolean(title.trim() && excerpt.trim() && content.trim() && categoryId);
+  const canPublish = canSave && status !== "published" && status !== "archived";
   const tags = tagInput
     .split(",")
     .map((tag) => tag.trim())
@@ -69,7 +66,8 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
       setArticleId(savedId);
       setStatus("draft");
       setMessage("Draft saved.");
-      if (mode === "create") {
+      if (editorMode === "create") {
+        setEditorMode("edit");
         router.replace(`/author/articles/${savedId}/edit`);
       } else {
         router.refresh();
@@ -82,16 +80,24 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
   }
 
   async function handlePublish() {
-    const savedId = articleId ?? (await saveAuthorArticle({ categoryId, content, excerpt, tags, title, visibility }));
-    setArticleId(savedId);
+    if (!canPublish) {
+      setMessage("Please complete title, excerpt, content, and category before publishing.");
+      return;
+    }
+
     setIsSaving(true);
     setMessage(null);
     try {
+      const savedId =
+        articleId ?? (await saveAuthorArticle({ categoryId, content, excerpt, tags, title, visibility }));
+      setArticleId(savedId);
       await publishAuthorArticle(savedId);
+      setEditorMode("edit");
       setStatus("published");
       setMessage("Article published.");
-      router.replace(`/author/articles/${savedId}/edit`);
-      router.refresh();
+      if (editorMode === "create") {
+        window.history.replaceState(null, "", `/author/articles/${savedId}/edit`);
+      }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Publish failed.");
     } finally {
@@ -148,9 +154,15 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
               <Button isDisabled={isSaving || !canSave} onPress={handleSave} variant="secondary">
                 {isSaving ? "Saving..." : "Save draft"}
               </Button>
-              <Button isDisabled={isSaving || !canSave} onPress={handlePublish} variant="primary">
-                Publish
-              </Button>
+              {status === "published" ? (
+                <Button isDisabled variant="secondary">
+                  Published
+                </Button>
+              ) : (
+                <Button isDisabled={isSaving || !canPublish} onPress={handlePublish} variant="primary">
+                  {isSaving ? "Publishing..." : "Publish"}
+                </Button>
+              )}
               {articleId ? (
                 <>
                   <Button isDisabled={isSaving || status === "archived"} onPress={handleWithdraw} variant="secondary">
@@ -240,33 +252,10 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
               <h3 className="text-lg font-semibold">Preview</h3>
-              <article className="mt-4 min-h-[520px] space-y-4 rounded-xl border border-white/10 bg-[#07101f] p-5 text-sm leading-7 text-white/70">
-                {preview.map((line, index) => {
-                  if (line.startsWith("# ")) {
-                    return (
-                      <h1 className="text-2xl font-semibold text-white" key={`${line}-${index}`}>
-                        {line.replace("# ", "")}
-                      </h1>
-                    );
-                  }
-                  if (line.startsWith("## ")) {
-                    return (
-                      <h2 className="text-xl font-semibold text-white" key={`${line}-${index}`}>
-                        {line.replace("## ", "")}
-                      </h2>
-                    );
-                  }
-                  if (line.startsWith("- ")) {
-                    return (
-                      <p className="pl-4" key={`${line}-${index}`}>
-                        {line}
-                      </p>
-                    );
-                  }
-
-                  return <p key={`${line}-${index}`}>{line}</p>;
-                })}
-              </article>
+              <MarkdownPreview
+                className="mt-4 min-h-[520px] space-y-6 rounded-xl border border-white/10 bg-[#07101f] p-5 text-[15px] leading-7 text-white/72"
+                content={content}
+              />
             </div>
           </section>
         </div>
