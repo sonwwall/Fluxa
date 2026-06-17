@@ -18,7 +18,7 @@ export function BlogHome({ data }: BlogHomeProps) {
         <TopNavigation active="Home" />
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
           <section className="flex min-w-0 flex-col gap-5">
-            <BlogHero topics={data.topics} />
+            <BlogHero featuredSlug={data.featured.slug} topics={data.topics} />
             <FeaturedArticle article={data.featured} />
             <ArticleRail data={data} />
           </section>
@@ -29,7 +29,7 @@ export function BlogHome({ data }: BlogHomeProps) {
   );
 }
 
-function BlogHero({ topics }: { topics: string[] }) {
+function BlogHero({ featuredSlug, topics }: { featuredSlug: string; topics: string[] }) {
   return (
     <section className="grid min-h-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(11,18,35,0.96),rgba(6,9,19,0.98))] p-5 shadow-[0_22px_80px_rgba(0,0,0,0.38)] lg:grid-cols-[1fr_360px] lg:p-8">
       <div className="flex flex-col justify-center gap-6">
@@ -50,7 +50,7 @@ function BlogHero({ topics }: { topics: string[] }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/articles/designing-resilient-systems">
+          <Link href={`/articles/${featuredSlug}`}>
             <Button className="shadow-[0_0_28px_rgba(68,150,255,0.45)]" variant="primary">
               Read latest
             </Button>

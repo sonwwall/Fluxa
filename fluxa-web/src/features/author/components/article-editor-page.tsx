@@ -1,8 +1,15 @@
 "use client";
 
 import { Button } from "@heroui/react";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import {
+  deleteAuthorArticle,
+  publishAuthorArticle,
+  saveAuthorArticle,
+  withdrawAuthorArticle,
+} from "../api/author";
 import type { AuthorArticleDraft, AuthorCategory } from "../types";
 import { AdminShell } from "./admin-shell";
 
@@ -13,12 +20,17 @@ type ArticleEditorPageProps = {
 };
 
 export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPageProps) {
+  const router = useRouter();
   const [title, setTitle] = useState(draft.title);
   const [excerpt, setExcerpt] = useState(draft.excerpt);
   const [content, setContent] = useState(draft.content);
   const [categoryId, setCategoryId] = useState(draft.categoryId);
   const [visibility, setVisibility] = useState(draft.visibility);
   const [tagInput, setTagInput] = useState(draft.tags.join(", "));
+  const [articleId, setArticleId] = useState(draft.id);
+  const [status, setStatus] = useState(draft.status);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   const preview = useMemo(() => {
     return content
@@ -28,6 +40,96 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
   }, [content]);
 
   const titleLabel = mode === "create" ? "New Article" : "Edit Article";
+  const canSave = Boolean(title.trim() && excerpt.trim() && content.trim() && categoryId);
+  const tags = tagInput
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+
+  async function handleSave() {
+    if (!canSave) {
+      setMessage("Please complete title, excerpt, content, and category.");
+      return;
+    }
+
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      const savedId = await saveAuthorArticle(
+        {
+          categoryId,
+          content,
+          excerpt,
+          tags,
+          title,
+          visibility,
+        },
+        articleId,
+      );
+      setArticleId(savedId);
+      setStatus("draft");
+      setMessage("Draft saved.");
+      if (mode === "create") {
+        router.replace(`/author/articles/${savedId}/edit`);
+      } else {
+        router.refresh();
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Save failed.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handlePublish() {
+    const savedId = articleId ?? (await saveAuthorArticle({ categoryId, content, excerpt, tags, title, visibility }));
+    setArticleId(savedId);
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      await publishAuthorArticle(savedId);
+      setStatus("published");
+      setMessage("Article published.");
+      router.replace(`/author/articles/${savedId}/edit`);
+      router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Publish failed.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleWithdraw() {
+    if (!articleId) return;
+
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      await withdrawAuthorArticle(articleId);
+      setStatus("archived");
+      setMessage("Article withdrawn.");
+      router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Withdraw failed.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!articleId) return;
+
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      await deleteAuthorArticle(articleId);
+      router.replace("/author/articles");
+      router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Delete failed.");
+      setIsSaving(false);
+    }
+  }
 
   return (
     <AdminShell
@@ -39,18 +141,33 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
         <div className="flex min-w-0 flex-col gap-5">
           <section className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-sm text-sky-200">{draft.status}</p>
+              <p className="text-sm text-sky-200">{status}</p>
               <h2 className="mt-1 text-2xl font-semibold">{titleLabel}</h2>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button isDisabled variant="secondary">
-                Save draft
+              <Button isDisabled={isSaving || !canSave} onPress={handleSave} variant="secondary">
+                {isSaving ? "Saving..." : "Save draft"}
               </Button>
-              <Button isDisabled variant="primary">
+              <Button isDisabled={isSaving || !canSave} onPress={handlePublish} variant="primary">
                 Publish
               </Button>
+              {articleId ? (
+                <>
+                  <Button isDisabled={isSaving || status === "archived"} onPress={handleWithdraw} variant="secondary">
+                    Withdraw
+                  </Button>
+                  <Button isDisabled={isSaving} onPress={handleDelete} variant="secondary">
+                    Delete
+                  </Button>
+                </>
+              ) : null}
             </div>
           </section>
+          {message ? (
+            <p className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/68">
+              {message}
+            </p>
+          ) : null}
 
           <section className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5 md:grid-cols-2">
             <label className="flex flex-col gap-2 text-sm text-white/70">
@@ -167,7 +284,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
           <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
             <h3 className="text-lg font-semibold">Publishing</h3>
             <p className="mt-3 text-sm leading-6 text-white/52">
-              Draft actions will become available when the author service is connected.
+              Changes are saved through the author service and reflected in the public blog after publish.
             </p>
           </section>
         </aside>

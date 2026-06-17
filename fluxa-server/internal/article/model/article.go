@@ -9,7 +9,10 @@ import (
 )
 
 const (
+	StatusDraft     = "draft"
 	StatusPublished = "published"
+	StatusScheduled = "scheduled"
+	StatusArchived  = "archived"
 
 	VisibilityInherit    = "inherit"
 	VisibilityPublic     = "public"

@@ -30,6 +30,7 @@ type Dependencies struct {
 func Register(h *server.Hertz, deps Dependencies) {
 	h.Use(middleware.RequestID())
 	h.Use(middleware.Recover(deps.Logger))
+	h.Use(middleware.CORS())
 	h.Use(middleware.RequestLogger(deps.Logger))
 
 	api := h.Group("/api/v1")
@@ -53,6 +54,18 @@ func registerPublicRoutes(api *route.RouterGroup, deps Dependencies) {
 	api.GET("/articles", articleHandler.List)
 	api.GET("/articles/:slug", articleHandler.Detail)
 	api.GET("/articles/:slug/related", articleHandler.Related)
+
+	author := api.Group("/author")
+	author.GET("/dashboard", articleHandler.AuthorDashboard)
+	author.GET("/articles", articleHandler.ListAuthorArticles)
+	author.GET("/articles/new", articleHandler.NewAuthorArticleDraft)
+	author.GET("/articles/:id", articleHandler.AuthorArticleDraft)
+	author.POST("/articles", articleHandler.CreateAuthorArticle)
+	author.PATCH("/articles/:id", articleHandler.UpdateAuthorArticle)
+	author.POST("/articles/:id/publish", articleHandler.PublishAuthorArticle)
+	author.POST("/articles/:id/withdraw", articleHandler.WithdrawAuthorArticle)
+	author.DELETE("/articles/:id", articleHandler.DeleteAuthorArticle)
+	author.GET("/categories", articleHandler.ListAuthorCategories)
 }
 
 func healthHandler(deps Dependencies) app.HandlerFunc {
