@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="fluxa-glow" cx="30%" cy="22%" r="76%">
+      <stop offset="0%" stop-color="#78f0ff" />
+      <stop offset="46%" stop-color="#3977ff" />
+      <stop offset="100%" stop-color="#7c4dff" />
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#050b18" />
+  <rect x="8" y="8" width="48" height="48" rx="14" fill="url(#fluxa-glow)" />
+  <path
+    d="M22 46V18h22v7H31v5h11v7H31v9h-9Z"
+    fill="#f8fbff"
+  />
+</svg>
