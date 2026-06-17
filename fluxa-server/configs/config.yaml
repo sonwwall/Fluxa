@@ -1,0 +1,24 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+  environment: "development"
+
+database:
+  enabled: true
+  host: "127.0.0.1"
+  port: 3306
+  username: "fluxa"
+  password: ""
+  database: "fluxa"
+  max_idle_connections: 10
+  max_open_connections: 50
+  connection_max_lifetime_seconds: 3600
+
+log:
+  level: "info"
+  encoding: "console"
+
+jwt:
+  issuer: "fluxa"
+  secret: ""
+  expires_in_seconds: 86400
