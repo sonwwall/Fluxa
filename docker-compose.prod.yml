@@ -15,7 +15,7 @@ services:
       - -c
       - mysql -h mysql -P 3306 -u"$${FLUXA_MYSQL_USER}" "$${FLUXA_MYSQL_DATABASE}" < /app/migrations/001_init_public_blog.sql
     volumes:
-      - ./fluxa-server/migrations:/app/migrations:ro
+      - ${DEPLOY_PATH:?set DEPLOY_PATH}/fluxa-server/migrations:/app/migrations:ro
     restart: "no"
 
   server:
