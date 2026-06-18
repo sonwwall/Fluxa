@@ -56,3 +56,38 @@
 - 解决了什么问题。
 - 做了哪些验证。
 - 还有哪些风险或未完成项，如没有可以不用说。
+
+
+## CI/CD 规则说明
+
+本项目使用自建 GitLab CI/CD，不使用 GitHub Actions。CI 配置文件为仓库根目录下的 `.gitlab-ci.yml`。当前 GitLab Runner 已注册并在线，Runner 标签为 `debian`，因此所有需要由该 Runner 执行的 job 都必须显式声明：
+
+```yaml
+tags:
+  - debian
+```
+
+项目主要维护两个分支：`dev` 和 `main`。编写 CI/CD 时应按分支区分行为：
+
+* `dev` 分支用于日常开发、测试和测试环境部署，可以自动执行测试、构建和 dev 环境部署。
+* `main` 分支用于稳定版本和生产发布，必须更加保守。生产部署类 job 应使用 `when: manual`，避免 push 后自动部署到生产环境。
+* 推荐使用 `rules` 控制分支行为，不建议使用已过时或不够灵活的 `only/except`。
+* 判断当前分支时使用 GitLab 内置变量 `$CI_COMMIT_BRANCH`。
+
+示例：
+
+```yaml
+rules:
+  - if: '$CI_COMMIT_BRANCH == "dev"'
+```
+
+或：
+
+```yaml
+rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+```
+
+CI 配置应优先保持清晰、可读、可维护。对于 dev 和 main 行为不同的流程，优先拆分为独立 job，例如 `deploy-dev` 和 `deploy-prod`，不要把大量分支判断塞进同一个脚本里。
+
+除非明确要求，不要修改 GitLab Runner 注册方式、Runner 标签、远程仓库地址、Docker 端口映射或 GitLab 部署配置。
