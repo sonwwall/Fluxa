@@ -72,12 +72,10 @@ build-dev-images:
     - test -n "$FLUXA_MYSQL_PASSWORD"
     - test -n "$FLUXA_JWT_SECRET"
   script:
-    - mkdir -p "$DEPLOY_PATH/fluxa-server"
-    - cp docker-compose.yml docker-compose.prod.yml "$DEPLOY_PATH/"
-    - rm -rf "$DEPLOY_PATH/fluxa-server/migrations"
-    - cp -r fluxa-server/migrations "$DEPLOY_PATH/fluxa-server/"
+    - mkdir -p .deploy
+    - cp docker-compose.yml docker-compose.prod.yml .deploy/
     - |
-      cat > "$DEPLOY_PATH/.env" <<EOF
+      cat > .deploy/.env <<EOF
       FLUXA_SERVER_IMAGE=$FLUXA_SERVER_IMAGE
       FLUXA_WEB_IMAGE=$FLUXA_WEB_IMAGE
       COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-fluxa}
@@ -92,7 +90,8 @@ build-dev-images:
       FLUXA_JWT_SECRET=$FLUXA_JWT_SECRET
       API_BASE_URL=${API_BASE_URL:-http://server:8080}
       EOF
-    - cd "$DEPLOY_PATH"
+    - tar -C .deploy -cf - . | docker run --rm -i -v "$DEPLOY_PATH:/deploy" alpine:3.21 sh -c "cd /deploy && tar -xf -"
+    - cd .deploy
     - docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
 
 deploy-dev:

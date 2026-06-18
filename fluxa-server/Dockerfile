@@ -12,10 +12,11 @@ FROM alpine:3.21
 
 WORKDIR /app
 
-RUN apk add --no-cache ca-certificates tzdata
+RUN apk add --no-cache ca-certificates mysql-client tzdata
 
 COPY --from=builder /out/fluxa-server /app/fluxa-server
 COPY configs /app/configs
+COPY migrations /app/migrations
 
 EXPOSE 8080
 

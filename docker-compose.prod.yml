@@ -1,4 +1,21 @@
 services:
+  migrate:
+    image: ${FLUXA_SERVER_IMAGE:?set FLUXA_SERVER_IMAGE}
+    container_name: ${FLUXA_CONTAINER_PREFIX:-fluxa}-migrate
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      FLUXA_MYSQL_DATABASE: ${FLUXA_MYSQL_DATABASE:-fluxa}
+      FLUXA_MYSQL_PASSWORD: ${FLUXA_MYSQL_PASSWORD:?set FLUXA_MYSQL_PASSWORD}
+      FLUXA_MYSQL_USER: ${FLUXA_MYSQL_USER:-fluxa}
+      MYSQL_PWD: ${FLUXA_MYSQL_PASSWORD:?set FLUXA_MYSQL_PASSWORD}
+    command:
+      - sh
+      - -c
+      - mysql -h mysql -P 3306 -u"$${FLUXA_MYSQL_USER}" "$${FLUXA_MYSQL_DATABASE}" < /app/migrations/001_init_public_blog.sql
+    restart: "no"
+
   server:
     image: ${FLUXA_SERVER_IMAGE:?set FLUXA_SERVER_IMAGE}
     container_name: ${FLUXA_CONTAINER_PREFIX:-fluxa}-server
@@ -6,6 +23,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       FLUXA_SERVER_ENVIRONMENT: ${FLUXA_SERVER_ENVIRONMENT:-production}
       FLUXA_DATABASE_HOST: mysql
