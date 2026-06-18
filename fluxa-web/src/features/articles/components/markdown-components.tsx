@@ -115,7 +115,7 @@ export function createMarkdownComponents({
     },
     pre({ children }) {
       return (
-        <pre className="not-prose overflow-x-auto rounded-lg border border-white/10 bg-[#070d1d] p-5 text-sm text-white/78">
+        <pre className="not-prose overflow-x-auto rounded-lg border border-sky-200/25 bg-[#151c2e] p-5 text-sm text-white/78">
           {children}
         </pre>
       );

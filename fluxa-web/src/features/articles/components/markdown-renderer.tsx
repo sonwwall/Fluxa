@@ -25,7 +25,7 @@ export async function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
             return (
               <div
-                className="not-prose overflow-hidden rounded-lg border border-white/10 bg-[#070d1d] text-sm [&_pre]:overflow-x-auto [&_pre]:p-5"
+                className="not-prose overflow-hidden rounded-lg border border-sky-200/25 bg-[#151c2e] text-sm [&_pre]:!m-0 [&_pre]:!bg-[#151c2e] [&_pre]:overflow-x-auto [&_pre]:p-5"
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             );

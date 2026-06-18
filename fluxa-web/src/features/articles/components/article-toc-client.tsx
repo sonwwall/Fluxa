@@ -20,6 +20,10 @@ export function ArticleTocClient({ items }: ArticleTocClientProps) {
   const headingIds = useMemo(() => flattenTocItems(items).map((item) => item.heading.id), [items]);
   const [activeId, setActiveId] = useState(headingIds[0] ?? "");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const visibleActiveId = useMemo(
+    () => getVisibleActiveHeadingId(items, activeId, expandedIds),
+    [activeId, expandedIds, items],
+  );
 
   useEffect(() => {
     if (headingIds.length === 0) {
@@ -63,7 +67,7 @@ export function ArticleTocClient({ items }: ArticleTocClientProps) {
       <div className="space-y-4">
         {items.map((item) => (
           <TocItem
-            activeId={activeId}
+            activeId={visibleActiveId}
             expandedIds={expandedIds}
             item={item}
             key={item.heading.id}
@@ -159,4 +163,53 @@ function getMarkerClassName(active: boolean) {
 
 function flattenTocItems(items: TocTreeItem[]): TocTreeItem[] {
   return items.flatMap((item) => [item, ...flattenTocItems(item.children)]);
+}
+
+function getVisibleActiveHeadingId(
+  items: TocTreeItem[],
+  activeId: string,
+  expandedIds: Set<string>,
+) {
+  const firstHeadingId = items[0]?.heading.id ?? "";
+
+  for (const item of items) {
+    const visibleActiveId = findVisibleActiveHeadingId(item, activeId, expandedIds, "", true);
+    if (visibleActiveId) {
+      return visibleActiveId;
+    }
+  }
+
+  return firstHeadingId;
+}
+
+function findVisibleActiveHeadingId(
+  item: TocTreeItem,
+  activeId: string,
+  expandedIds: Set<string>,
+  nearestVisibleId: string,
+  isVisible: boolean,
+): string | null {
+  const currentVisibleId = isVisible ? item.heading.id : nearestVisibleId;
+
+  if (item.heading.id === activeId) {
+    return currentVisibleId;
+  }
+
+  const areChildrenVisible = isVisible && expandedIds.has(item.heading.id);
+
+  for (const child of item.children) {
+    const visibleActiveId = findVisibleActiveHeadingId(
+      child,
+      activeId,
+      expandedIds,
+      currentVisibleId,
+      areChildrenVisible,
+    );
+
+    if (visibleActiveId) {
+      return visibleActiveId;
+    }
+  }
+
+  return null;
 }
