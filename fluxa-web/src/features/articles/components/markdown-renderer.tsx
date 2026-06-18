@@ -19,7 +19,7 @@ export async function MarkdownRenderer({ content }: MarkdownRendererProps) {
         blocks.map(async (block, index) => {
           if (block.type === "heading") {
             return (
-              <h2 className={getHeadingClass(block.level)} key={`${block.text}-${index}`}>
+              <h2 className={getHeadingClass(block.level)} id={block.id} key={`${block.text}-${index}`}>
                 {block.text}
               </h2>
             );

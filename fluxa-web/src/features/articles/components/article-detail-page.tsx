@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ArticleDetail, ArticleSummary } from "../types";
 import { formatArticleDate } from "./format";
 import { MarkdownRenderer } from "./markdown-renderer";
+import { parseMarkdown, type MarkdownBlock } from "./markdown-renderer-core";
 import { TopNavigation } from "./top-navigation";
 
 type ArticleDetailPageProps = {
@@ -132,35 +133,46 @@ function ArticleRelated({ articles }: { articles: ArticleSummary[] }) {
 }
 
 function ArticleToc({ article }: { article: ArticleDetail }) {
+  const headings = parseMarkdown(article.content).filter(isArticleTocHeading);
+
+  if (headings.length === 0) {
+    return null;
+  }
+
   return (
-    <aside className="sticky top-5 hidden rounded-lg border border-white/10 bg-white/[0.035] p-7 xl:block">
+    <aside className="sticky top-5 hidden max-h-[calc(100vh-2.5rem)] self-start overflow-hidden rounded-lg border border-white/10 bg-white/[0.035] p-7 xl:block">
       <h2 className="text-lg font-semibold">On this page</h2>
-      <div className="relative mt-6">
+      <div className="relative mt-6 max-h-[calc(100vh-9rem)] overflow-y-auto pr-1">
         <div className="absolute bottom-2 left-1.5 top-2 w-px bg-white/20" />
         <div className="space-y-4">
-          {article.toc.map((item, index) => (
-            <div className="relative flex gap-4" key={`${item.number}-${item.label}-${index}`}>
+          {headings.map((item, index) => (
+            <a
+              className="group relative flex gap-4"
+              href={`#${item.id}`}
+              key={`${item.id}-${index}`}
+            >
               <span
                 className={`mt-1 h-3 w-3 shrink-0 rounded-full ${
-                  item.number ? "bg-white/42" : "bg-transparent"
-                } ${item.active ? "shadow-[0_0_18px_rgba(56,189,248,0.95)] !bg-sky-300" : ""}`}
+                  index === 0 ? "bg-sky-300 shadow-[0_0_18px_rgba(56,189,248,0.95)]" : "bg-white/42"
+                } transition group-hover:bg-sky-200`}
               />
               <p
-                className={`text-sm ${
-                  item.active
-                    ? "text-sky-300"
-                    : item.number
-                      ? "text-white/72"
-                      : "pl-5 text-white/46"
-                }`}
+                className={`text-sm transition group-hover:text-sky-200 ${
+                  index === 0 ? "text-sky-300" : "text-white/72"
+                } ${item.level > 2 ? "pl-5 text-white/58" : ""}`}
               >
-                {item.number ? `${item.number} ` : ""}
-                {item.label}
+                {item.text}
               </p>
-            </div>
+            </a>
           ))}
         </div>
       </div>
     </aside>
   );
+}
+
+function isArticleTocHeading(
+  block: MarkdownBlock,
+): block is Extract<MarkdownBlock, { type: "heading" }> {
+  return block.type === "heading" && block.level > 1;
 }

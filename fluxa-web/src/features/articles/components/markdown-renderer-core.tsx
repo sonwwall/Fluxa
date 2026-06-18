@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export type MarkdownBlock =
-  | { level: number; text: string; type: "heading" }
+  | { id: string; level: number; text: string; type: "heading" }
   | { items: string[]; type: "list" }
   | { text: string; type: "paragraph" }
   | { text: string; type: "quote" }
@@ -10,6 +10,7 @@ export type MarkdownBlock =
 export function parseMarkdown(content: string): MarkdownBlock[] {
   const lines = content.trim().split("\n");
   const blocks: MarkdownBlock[] = [];
+  const headingIds = new Map<string, number>();
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index] ?? "";
@@ -32,6 +33,7 @@ export function parseMarkdown(content: string): MarkdownBlock[] {
       const match = /^(#{1,4})\s+(.*)$/.exec(line);
       if (match) {
         blocks.push({
+          id: getUniqueHeadingId(match[2], headingIds),
           level: match[1].length,
           text: match[2],
           type: "heading",
@@ -61,12 +63,31 @@ export function parseMarkdown(content: string): MarkdownBlock[] {
   return blocks;
 }
 
+function getUniqueHeadingId(text: string, usedIds: Map<string, number>) {
+  const baseId = slugifyHeading(text);
+  const usedCount = usedIds.get(baseId) ?? 0;
+  usedIds.set(baseId, usedCount + 1);
+
+  return usedCount === 0 ? baseId : `${baseId}-${usedCount + 1}`;
+}
+
+export function slugifyHeading(text: string) {
+  const slug = text
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug || "section";
+}
+
 export function getHeadingClass(level: number) {
   return level === 1
-    ? "text-2xl font-semibold text-white"
+    ? "scroll-mt-8 text-2xl font-semibold text-white"
     : level === 2
-      ? "pt-2 text-2xl font-semibold text-white"
-      : "text-xl font-semibold text-white";
+      ? "scroll-mt-8 pt-2 text-2xl font-semibold text-white"
+      : "scroll-mt-8 text-xl font-semibold text-white";
 }
 
 export function renderInline(text: string): ReactNode[] {
