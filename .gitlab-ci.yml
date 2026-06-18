@@ -46,6 +46,7 @@ frontend-test:
   before_script:
     - export DOCKER_HOST="unix:///var/run/docker.sock"
     - docker version
+    - docker info
   script:
     - docker build -t "$FLUXA_SERVER_IMAGE" fluxa-server
     - docker build -t "$FLUXA_WEB_IMAGE" fluxa-web
@@ -65,6 +66,7 @@ build-dev-images:
   before_script:
     - export DOCKER_HOST="unix:///var/run/docker.sock"
     - docker version
+    - docker info
     - test -n "$DEPLOY_PATH"
     - test -n "$FLUXA_MYSQL_ROOT_PASSWORD"
     - test -n "$FLUXA_MYSQL_PASSWORD"
