@@ -4,7 +4,7 @@ import type { ArticleDetail, ArticleSummary } from "../types";
 import { ArticleTocClient, type TocTreeItem } from "./article-toc-client";
 import { formatArticleDate } from "./format";
 import { MarkdownRenderer } from "./markdown-renderer";
-import { parseMarkdown, type MarkdownBlock } from "./markdown-renderer-core";
+import { extractMarkdownHeadings, type MarkdownHeading } from "./markdown-renderer-core";
 import { TopNavigation } from "./top-navigation";
 
 type ArticleDetailPageProps = {
@@ -134,7 +134,7 @@ function ArticleRelated({ articles }: { articles: ArticleSummary[] }) {
 }
 
 function ArticleToc({ article }: { article: ArticleDetail }) {
-  const tocTree = buildTocTree(parseMarkdown(article.content).filter(isArticleTocHeading));
+  const tocTree = buildTocTree(extractMarkdownHeadings(article.content).filter(isArticleTocHeading));
 
   if (tocTree.length === 0) {
     return null;
@@ -148,15 +148,11 @@ function ArticleToc({ article }: { article: ArticleDetail }) {
   );
 }
 
-type TocHeading = Extract<MarkdownBlock, { type: "heading" }>;
-
-function isArticleTocHeading(
-  block: MarkdownBlock,
-): block is TocHeading {
-  return block.type === "heading" && block.level > 1;
+function isArticleTocHeading(heading: MarkdownHeading) {
+  return heading.level > 1;
 }
 
-function buildTocTree(headings: TocHeading[]) {
+function buildTocTree(headings: MarkdownHeading[]) {
   const tree: TocTreeItem[] = [];
   const stack: TocTreeItem[] = [];
 

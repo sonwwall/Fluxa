@@ -1,5 +1,7 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "@heroui/react/styles";
+@import "katex/dist/katex.min.css";
 
 :root {
   color-scheme: light;
