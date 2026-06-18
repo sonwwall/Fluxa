@@ -9,8 +9,8 @@ workflow:
 
 variables:
   DOCKER_BUILDKIT: "1"
-  FLUXA_SERVER_IMAGE: "$CI_REGISTRY_IMAGE/fluxa-server:$CI_COMMIT_SHA"
-  FLUXA_WEB_IMAGE: "$CI_REGISTRY_IMAGE/fluxa-web:$CI_COMMIT_SHA"
+  FLUXA_SERVER_IMAGE: "$CI_PROJECT_PATH_SLUG-fluxa-server:$CI_COMMIT_SHA"
+  FLUXA_WEB_IMAGE: "$CI_PROJECT_PATH_SLUG-fluxa-web:$CI_COMMIT_SHA"
 
 backend-test:
   stage: test
@@ -42,13 +42,9 @@ frontend-test:
   image: docker:27
   tags:
     - debian
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
     - docker build -t "$FLUXA_SERVER_IMAGE" fluxa-server
     - docker build -t "$FLUXA_WEB_IMAGE" fluxa-web
-    - docker push "$FLUXA_SERVER_IMAGE"
-    - docker push "$FLUXA_WEB_IMAGE"
 
 build-dev-images:
   extends: .build-images-template
@@ -88,9 +84,7 @@ build-dev-images:
       FLUXA_JWT_SECRET=$FLUXA_JWT_SECRET
       API_BASE_URL=${API_BASE_URL:-http://server:8080}
       EOF
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - cd "$DEPLOY_PATH"
-    - docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
     - docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
 
 deploy-dev:
