@@ -8,6 +8,7 @@ workflow:
     - if: '$CI_COMMIT_BRANCH == "dev"'
 
 variables:
+  DOCKER_HOST: "unix:///var/run/docker.sock"
   DOCKER_BUILDKIT: "1"
   FLUXA_SERVER_IMAGE: "$CI_PROJECT_PATH_SLUG-fluxa-server:$CI_COMMIT_SHA"
   FLUXA_WEB_IMAGE: "$CI_PROJECT_PATH_SLUG-fluxa-web:$CI_COMMIT_SHA"
@@ -42,6 +43,9 @@ frontend-test:
   image: docker:27
   tags:
     - debian
+  before_script:
+    - export DOCKER_HOST="unix:///var/run/docker.sock"
+    - docker version
   script:
     - docker build -t "$FLUXA_SERVER_IMAGE" fluxa-server
     - docker build -t "$FLUXA_WEB_IMAGE" fluxa-web
@@ -59,6 +63,8 @@ build-dev-images:
   tags:
     - debian
   before_script:
+    - export DOCKER_HOST="unix:///var/run/docker.sock"
+    - docker version
     - test -n "$DEPLOY_PATH"
     - test -n "$FLUXA_MYSQL_ROOT_PASSWORD"
     - test -n "$FLUXA_MYSQL_PASSWORD"
