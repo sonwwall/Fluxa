@@ -45,6 +45,17 @@ export function createMarkdownComponents({
         return renderCodeBlock(code, lang);
       }
 
+      if (!inline) {
+        return (
+          <code
+            className="block overflow-x-auto rounded-xl border border-sky-200/25 bg-[#151c2e] p-6 text-sm text-white/78 before:content-none after:content-none"
+            {...props}
+          >
+            {children}
+          </code>
+        );
+      }
+
       return (
         <code
           className="rounded bg-white/10 px-1.5 py-0.5 text-[0.92em] text-sky-100 before:content-none after:content-none"
@@ -114,11 +125,7 @@ export function createMarkdownComponents({
       return <p className="leading-7 text-white/72">{children}</p>;
     },
     pre({ children }) {
-      return (
-        <pre className="not-prose overflow-x-auto rounded-lg border border-sky-200/25 bg-[#151c2e] p-5 text-sm text-white/78">
-          {children}
-        </pre>
-      );
+      return <div className="not-prose my-6">{children}</div>;
     },
     table({ children }) {
       return (
