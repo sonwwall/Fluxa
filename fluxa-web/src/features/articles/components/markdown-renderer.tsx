@@ -6,6 +6,7 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 
+import { MarkdownCodeBlock } from "./markdown-code-block";
 import { createMarkdownComponents } from "./markdown-components";
 
 type MarkdownRendererProps = {
@@ -23,12 +24,7 @@ export async function MarkdownRenderer({ content }: MarkdownRendererProps) {
               theme: "github-dark",
             });
 
-            return (
-              <div
-                className="markdown-code-block overflow-hidden rounded-xl border border-sky-200/25 bg-[#151c2e] text-sm [&_pre]:!m-0 [&_pre]:!border-0 [&_pre]:!bg-transparent [&_pre]:!p-6 [&_pre]:overflow-x-auto"
-                dangerouslySetInnerHTML={{ __html: html }}
-              />
-            );
+            return <MarkdownCodeBlock code={code} html={html} />;
           },
         })}
         rehypePlugins={[rehypeSanitize, rehypeSlug, rehypeKatex]}

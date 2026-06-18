@@ -37,23 +37,12 @@ export function createMarkdownComponents({
         </blockquote>
       );
     },
-    code({ children, className, inline, ...props }: CodeProps) {
+    code({ children, className, ...props }: CodeProps) {
       const lang = /language-(\S+)/.exec(className ?? "")?.[1];
       const code = String(children).replace(/\n$/, "");
 
-      if (!inline && lang && renderCodeBlock) {
+      if (lang && renderCodeBlock) {
         return renderCodeBlock(code, lang);
-      }
-
-      if (!inline) {
-        return (
-          <code
-            className="block overflow-x-auto rounded-xl border border-sky-200/25 bg-[#151c2e] p-6 text-sm text-white/78 before:content-none after:content-none"
-            {...props}
-          >
-            {children}
-          </code>
-        );
       }
 
       return (
