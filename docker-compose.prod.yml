@@ -1,6 +1,6 @@
 services:
   migrate:
-    image: ${FLUXA_SERVER_IMAGE:?set FLUXA_SERVER_IMAGE}
+    image: mysql:8.4
     container_name: ${FLUXA_CONTAINER_PREFIX:-fluxa}-migrate
     depends_on:
       mysql:
@@ -14,6 +14,8 @@ services:
       - sh
       - -c
       - mysql -h mysql -P 3306 -u"$${FLUXA_MYSQL_USER}" "$${FLUXA_MYSQL_DATABASE}" < /app/migrations/001_init_public_blog.sql
+    volumes:
+      - ./fluxa-server/migrations:/app/migrations:ro
     restart: "no"
 
   server:

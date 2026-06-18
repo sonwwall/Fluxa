@@ -74,6 +74,8 @@ build-dev-images:
   script:
     - mkdir -p .deploy
     - cp docker-compose.yml docker-compose.prod.yml .deploy/
+    - mkdir -p .deploy/fluxa-server
+    - cp -r fluxa-server/migrations .deploy/fluxa-server/
     - |
       cat > .deploy/.env <<EOF
       FLUXA_SERVER_IMAGE=$FLUXA_SERVER_IMAGE
