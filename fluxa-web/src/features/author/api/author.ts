@@ -7,7 +7,7 @@ import type {
   AuthorDashboardStat,
 } from "../types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8080";
+const SERVER_API_BASE_URL = process.env.API_BASE_URL ?? "http://127.0.0.1:8080";
 
 type ApiResponse<T> = {
   code: number;
@@ -82,7 +82,8 @@ type SaveAuthorArticlePayload = {
 };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const apiBaseUrl = typeof window === "undefined" ? SERVER_API_BASE_URL : "";
+  const response = await fetch(`${apiBaseUrl}${path}`, {
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",

@@ -1,0 +1,9 @@
+.git
+.next
+node_modules
+.pnpm-store
+coverage
+dist
+build
+*.log
+tsconfig.tsbuildinfo

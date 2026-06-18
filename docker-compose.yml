@@ -1,7 +1,7 @@
 services:
   mysql:
     image: mysql:8.4
-    container_name: fluxa-mysql
+    container_name: ${FLUXA_CONTAINER_PREFIX:-fluxa}-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${FLUXA_MYSQL_ROOT_PASSWORD:?set FLUXA_MYSQL_ROOT_PASSWORD}
@@ -10,9 +10,10 @@ services:
       MYSQL_PASSWORD: ${FLUXA_MYSQL_PASSWORD:?set FLUXA_MYSQL_PASSWORD}
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "${FLUXA_MYSQL_PORT:-3306}:3306"
     volumes:
       - fluxa_mysql_data:/var/lib/mysql
+      - ./fluxa-server/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"]
       interval: 10s

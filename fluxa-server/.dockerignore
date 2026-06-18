@@ -1,0 +1,7 @@
+.git
+.gocache
+*.test
+*.out
+*.prof
+coverage.out
+vendor

@@ -1,0 +1,103 @@
+stages:
+  - test
+  - build
+  - deploy
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+
+variables:
+  DOCKER_BUILDKIT: "1"
+  FLUXA_SERVER_IMAGE: "$CI_REGISTRY_IMAGE/fluxa-server:$CI_COMMIT_SHA"
+  FLUXA_WEB_IMAGE: "$CI_REGISTRY_IMAGE/fluxa-web:$CI_COMMIT_SHA"
+
+backend-test:
+  stage: test
+  image: golang:1.24
+  tags:
+    - debian
+  script:
+    - cd fluxa-server
+    - go test ./...
+
+frontend-test:
+  stage: test
+  image: node:22
+  tags:
+    - debian
+  variables:
+    API_BASE_URL: "http://127.0.0.1:8080"
+  before_script:
+    - cd fluxa-web
+    - corepack enable
+    - pnpm install --frozen-lockfile
+  script:
+    - pnpm lint
+    - pnpm typecheck
+    - pnpm build
+
+.build-images-template:
+  stage: build
+  image: docker:27
+  tags:
+    - debian
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    - docker build -t "$FLUXA_SERVER_IMAGE" fluxa-server
+    - docker build -t "$FLUXA_WEB_IMAGE" fluxa-web
+    - docker push "$FLUXA_SERVER_IMAGE"
+    - docker push "$FLUXA_WEB_IMAGE"
+
+build-dev-images:
+  extends: .build-images-template
+  environment:
+    name: dev
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+
+.deploy-template:
+  stage: deploy
+  image: docker:27
+  tags:
+    - debian
+  before_script:
+    - test -n "$DEPLOY_PATH"
+    - test -n "$FLUXA_MYSQL_ROOT_PASSWORD"
+    - test -n "$FLUXA_MYSQL_PASSWORD"
+    - test -n "$FLUXA_JWT_SECRET"
+  script:
+    - mkdir -p "$DEPLOY_PATH/fluxa-server"
+    - cp docker-compose.yml docker-compose.prod.yml "$DEPLOY_PATH/"
+    - rm -rf "$DEPLOY_PATH/fluxa-server/migrations"
+    - cp -r fluxa-server/migrations "$DEPLOY_PATH/fluxa-server/"
+    - |
+      cat > "$DEPLOY_PATH/.env" <<EOF
+      FLUXA_SERVER_IMAGE=$FLUXA_SERVER_IMAGE
+      FLUXA_WEB_IMAGE=$FLUXA_WEB_IMAGE
+      COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-fluxa}
+      FLUXA_CONTAINER_PREFIX=${FLUXA_CONTAINER_PREFIX:-fluxa}
+      FLUXA_SERVER_ENVIRONMENT=$CI_ENVIRONMENT_NAME
+      FLUXA_SERVER_PORT=${FLUXA_SERVER_PORT:-8080}
+      FLUXA_WEB_PORT=${FLUXA_WEB_PORT:-3000}
+      FLUXA_MYSQL_ROOT_PASSWORD=$FLUXA_MYSQL_ROOT_PASSWORD
+      FLUXA_MYSQL_DATABASE=${FLUXA_MYSQL_DATABASE:-fluxa}
+      FLUXA_MYSQL_USER=${FLUXA_MYSQL_USER:-fluxa}
+      FLUXA_MYSQL_PASSWORD=$FLUXA_MYSQL_PASSWORD
+      FLUXA_JWT_SECRET=$FLUXA_JWT_SECRET
+      API_BASE_URL=${API_BASE_URL:-http://server:8080}
+      EOF
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - cd "$DEPLOY_PATH"
+    - docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+    - docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+
+deploy-dev:
+  extends: .deploy-template
+  environment:
+    name: dev
+  needs:
+    - build-dev-images
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
