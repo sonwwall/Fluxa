@@ -16,7 +16,7 @@ type MarkdownRendererProps = {
 
 export async function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
-    <article className="prose prose-invert max-w-none text-[15px] leading-7 prose-headings:tracking-normal prose-a:no-underline prose-pre:bg-transparent prose-pre:p-0">
+    <article className="prose prose-invert max-w-none text-[calc(15px*var(--article-font-scale,1))] leading-[calc(1.75rem*var(--article-font-scale,1))] prose-headings:tracking-normal prose-a:no-underline prose-pre:bg-transparent prose-pre:p-0">
       {splitMarkdownDetails(content).map((segment, index) => (
         <MarkdownSegmentRenderer index={index} key={`${segment.type}-${index}`} segment={segment} />
       ))}
@@ -31,7 +31,7 @@ function MarkdownSegmentRenderer({ index, segment }: { index: number; segment: M
         <summary className="cursor-pointer select-none text-base font-semibold text-white">
           {segment.summary}
         </summary>
-        <div className="prose prose-invert mt-4 max-w-none text-[15px] leading-7 prose-headings:tracking-normal prose-a:no-underline prose-pre:bg-transparent prose-pre:p-0">
+        <div className="prose prose-invert mt-4 max-w-none text-[calc(15px*var(--article-font-scale,1))] leading-[calc(1.75rem*var(--article-font-scale,1))] prose-headings:tracking-normal prose-a:no-underline prose-pre:bg-transparent prose-pre:p-0">
           <MarkdownContent content={segment.content} />
         </div>
       </details>

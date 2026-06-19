@@ -88,17 +88,17 @@ export function splitMarkdownDetails(content: string): MarkdownSegment[] {
 export function getHeadingClass(level: number) {
   switch (level) {
     case 1:
-      return "scroll-mt-24 pt-3 text-4xl font-semibold leading-tight text-white sm:text-5xl";
+      return "scroll-mt-24 !mb-4 !mt-8 pt-2 text-[calc(2rem*var(--article-font-scale,1))] font-semibold leading-tight text-white sm:text-[calc(2.5rem*var(--article-font-scale,1))]";
     case 2:
-      return "scroll-mt-24 pt-5 text-3xl font-semibold leading-snug text-white sm:text-4xl";
+      return "scroll-mt-24 !mb-3 !mt-7 pt-3 text-[calc(1.625rem*var(--article-font-scale,1))] font-semibold leading-snug text-white sm:text-[calc(2rem*var(--article-font-scale,1))]";
     case 3:
-      return "scroll-mt-24 pt-4 text-2xl font-semibold leading-snug text-white sm:text-3xl";
+      return "scroll-mt-24 !mb-3 !mt-6 pt-2 text-[calc(1.375rem*var(--article-font-scale,1))] font-semibold leading-snug text-white sm:text-[calc(1.625rem*var(--article-font-scale,1))]";
     case 4:
-      return "scroll-mt-24 pt-3 text-xl font-semibold leading-snug text-white sm:text-2xl";
+      return "scroll-mt-24 !mb-2 !mt-5 pt-1 text-[calc(1.125rem*var(--article-font-scale,1))] font-semibold leading-snug text-white sm:text-[calc(1.375rem*var(--article-font-scale,1))]";
     case 5:
-      return "scroll-mt-24 pt-2 text-lg font-semibold leading-snug text-white/90 sm:text-xl";
+      return "scroll-mt-24 !mb-2 !mt-4 text-[calc(1rem*var(--article-font-scale,1))] font-semibold leading-snug text-white/90 sm:text-[calc(1.125rem*var(--article-font-scale,1))]";
     default:
-      return "scroll-mt-24 pt-1 text-base font-semibold leading-snug text-white/76 sm:text-lg";
+      return "scroll-mt-24 !mb-2 !mt-3 text-[calc(0.9375rem*var(--article-font-scale,1))] font-semibold leading-snug text-white/76 sm:text-[calc(1rem*var(--article-font-scale,1))]";
   }
 }
 

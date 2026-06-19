@@ -158,16 +158,16 @@ function MarkdownHeading({
   if (level === 1) {
     return (
       <HeadingTag className={getHeadingClass(level)} id={id}>
-        <span className="flex items-center gap-4">
+        <span className="flex items-center gap-3">
           <span
             aria-hidden="true"
-            className="h-7 w-7 shrink-0 rotate-45 rounded-[6px] bg-gradient-to-br from-sky-300 via-blue-500 to-violet-400 shadow-[0_0_24px_rgba(56,189,248,0.42)]"
+            className="h-6 w-6 shrink-0 rotate-45 rounded-[6px] bg-gradient-to-br from-sky-300 via-blue-500 to-violet-400 shadow-[0_0_24px_rgba(56,189,248,0.42)]"
           />
           <span className="min-w-0 break-words">{children}</span>
         </span>
         <span
           aria-hidden="true"
-          className="mt-4 block h-px w-full bg-gradient-to-r from-sky-400 via-blue-400 to-violet-400"
+          className="mt-3 block h-px w-full bg-gradient-to-r from-sky-400 via-blue-400 to-violet-400"
         />
       </HeadingTag>
     );
@@ -176,14 +176,14 @@ function MarkdownHeading({
   if (level === 2) {
     return (
       <HeadingTag className={getHeadingClass(level)} id={id}>
-        <span className="flex items-center gap-4">
+        <span className="flex items-center gap-3">
           <span
             aria-hidden="true"
-            className="h-10 w-1.5 shrink-0 rounded-full bg-gradient-to-b from-sky-300 to-blue-500 shadow-[0_0_18px_rgba(56,189,248,0.28)]"
+            className="h-8 w-1.5 shrink-0 rounded-full bg-gradient-to-b from-sky-300 to-blue-500 shadow-[0_0_18px_rgba(56,189,248,0.28)]"
           />
           <span className="min-w-0 break-words">{children}</span>
         </span>
-        <span className="mt-3 block border-b border-dashed border-sky-200/45" />
+        <span className="mt-2 block border-b border-dashed border-sky-200/45" />
       </HeadingTag>
     );
   }
@@ -191,11 +191,11 @@ function MarkdownHeading({
   if (level === 3) {
     return (
       <HeadingTag className={getHeadingClass(level)} id={id}>
-        <span className="flex items-center gap-3">
-          <span aria-hidden="true" className="h-5 w-5 shrink-0 rounded-full border-[3px] border-sky-400" />
+        <span className="flex items-center gap-2.5">
+          <span aria-hidden="true" className="h-4 w-4 shrink-0 rounded-full border-[3px] border-sky-400" />
           <span className="min-w-0 break-words">{children}</span>
         </span>
-        <span className="mt-3 block border-b border-dashed border-white/18" />
+        <span className="mt-2 block border-b border-dashed border-white/18" />
       </HeadingTag>
     );
   }
@@ -203,8 +203,8 @@ function MarkdownHeading({
   if (level === 4) {
     return (
       <HeadingTag className={getHeadingClass(level)} id={id}>
-        <span className="flex items-center gap-3">
-          <span aria-hidden="true" className="h-7 w-1 shrink-0 rounded-full bg-sky-400" />
+        <span className="flex items-center gap-2.5">
+          <span aria-hidden="true" className="h-6 w-1 shrink-0 rounded-full bg-sky-400" />
           <span className="min-w-0 break-words">{children}</span>
         </span>
       </HeadingTag>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { ArticleDetail, ArticleSummary } from "../types";
+import { ArticleReadingFontControls } from "./article-reading-font-controls";
 import { ArticleTocClient, type TocTreeItem } from "./article-toc-client";
 import { formatArticleDate } from "./format";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -23,7 +24,9 @@ export async function ArticleDetailPage({
         <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="min-w-0 space-y-7">
             <ArticleDetailHeader article={article} />
-            <MarkdownRenderer content={article.content} />
+            <ArticleReadingFontControls>
+              <MarkdownRenderer content={article.content} />
+            </ArticleReadingFontControls>
             <ArticleRelated articles={relatedArticles} />
           </div>
           <ArticleToc article={article} />
