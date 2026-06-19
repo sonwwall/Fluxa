@@ -145,7 +145,7 @@ function ArticleToc({ article }: { article: ArticleDetail }) {
 
   return (
     <aside className="sticky top-5 hidden max-h-[calc(100vh-2.5rem)] self-start overflow-hidden rounded-lg border border-white/10 bg-white/[0.035] p-7 xl:block">
-      <h2 className="text-lg font-semibold">On this page</h2>
+      <h2 className="text-lg font-semibold">Contents</h2>
       <ArticleTocClient items={tocTree} />
     </aside>
   );
