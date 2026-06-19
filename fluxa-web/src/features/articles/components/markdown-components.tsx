@@ -55,32 +55,22 @@ export function createMarkdownComponents({
       );
     },
     h1({ children, id }) {
-      return (
-        <h1 className={getHeadingClass(1)} id={id}>
-          {children}
-        </h1>
-      );
+      return <MarkdownHeading id={id} level={1}>{children}</MarkdownHeading>;
     },
     h2({ children, id }) {
-      return (
-        <h2 className={getHeadingClass(2)} id={id}>
-          {children}
-        </h2>
-      );
+      return <MarkdownHeading id={id} level={2}>{children}</MarkdownHeading>;
     },
     h3({ children, id }) {
-      return (
-        <h3 className={getHeadingClass(3)} id={id}>
-          {children}
-        </h3>
-      );
+      return <MarkdownHeading id={id} level={3}>{children}</MarkdownHeading>;
     },
     h4({ children, id }) {
-      return (
-        <h4 className={getHeadingClass(4)} id={id}>
-          {children}
-        </h4>
-      );
+      return <MarkdownHeading id={id} level={4}>{children}</MarkdownHeading>;
+    },
+    h5({ children, id }) {
+      return <MarkdownHeading id={id} level={5}>{children}</MarkdownHeading>;
+    },
+    h6({ children, id }) {
+      return <MarkdownHeading id={id} level={6}>{children}</MarkdownHeading>;
     },
     hr() {
       return <hr className="border-white/12" />;
@@ -152,4 +142,95 @@ export function createMarkdownComponents({
       return <ul className="list-disc space-y-1 pl-6">{children}</ul>;
     },
   };
+}
+
+function MarkdownHeading({
+  children,
+  id,
+  level,
+}: {
+  children: ReactNode;
+  id?: string;
+  level: 1 | 2 | 3 | 4 | 5 | 6;
+}) {
+  const HeadingTag = `h${level}` as const;
+
+  if (level === 1) {
+    return (
+      <HeadingTag className={getHeadingClass(level)} id={id}>
+        <span className="flex items-center gap-4">
+          <span
+            aria-hidden="true"
+            className="h-7 w-7 shrink-0 rotate-45 rounded-[6px] bg-gradient-to-br from-sky-300 via-blue-500 to-violet-400 shadow-[0_0_24px_rgba(56,189,248,0.42)]"
+          />
+          <span className="min-w-0 break-words">{children}</span>
+        </span>
+        <span
+          aria-hidden="true"
+          className="mt-4 block h-px w-full bg-gradient-to-r from-sky-400 via-blue-400 to-violet-400"
+        />
+      </HeadingTag>
+    );
+  }
+
+  if (level === 2) {
+    return (
+      <HeadingTag className={getHeadingClass(level)} id={id}>
+        <span className="flex items-center gap-4">
+          <span
+            aria-hidden="true"
+            className="h-10 w-1.5 shrink-0 rounded-full bg-gradient-to-b from-sky-300 to-blue-500 shadow-[0_0_18px_rgba(56,189,248,0.28)]"
+          />
+          <span className="min-w-0 break-words">{children}</span>
+        </span>
+        <span className="mt-3 block border-b border-dashed border-sky-200/45" />
+      </HeadingTag>
+    );
+  }
+
+  if (level === 3) {
+    return (
+      <HeadingTag className={getHeadingClass(level)} id={id}>
+        <span className="flex items-center gap-3">
+          <span aria-hidden="true" className="h-5 w-5 shrink-0 rounded-full border-[3px] border-sky-400" />
+          <span className="min-w-0 break-words">{children}</span>
+        </span>
+        <span className="mt-3 block border-b border-dashed border-white/18" />
+      </HeadingTag>
+    );
+  }
+
+  if (level === 4) {
+    return (
+      <HeadingTag className={getHeadingClass(level)} id={id}>
+        <span className="flex items-center gap-3">
+          <span aria-hidden="true" className="h-7 w-1 shrink-0 rounded-full bg-sky-400" />
+          <span className="min-w-0 break-words">{children}</span>
+        </span>
+      </HeadingTag>
+    );
+  }
+
+  if (level === 5) {
+    return (
+      <HeadingTag className={getHeadingClass(level)} id={id}>
+        <span className="flex items-center gap-2.5">
+          <span
+            aria-hidden="true"
+            className="h-2.5 w-2.5 shrink-0 rotate-45 border-r-2 border-t-2 border-sky-400"
+          />
+          <span className="min-w-0 break-words">{children}</span>
+        </span>
+      </HeadingTag>
+    );
+  }
+
+  return (
+    <HeadingTag className={getHeadingClass(level)} id={id}>
+      <span className="flex items-center gap-2.5">
+        <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-blue-400" />
+        <span className="min-w-0 break-words">{children}</span>
+      </span>
+    </HeadingTag>
+  );
 }

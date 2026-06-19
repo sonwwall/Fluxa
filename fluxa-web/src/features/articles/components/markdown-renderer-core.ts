@@ -86,11 +86,20 @@ export function splitMarkdownDetails(content: string): MarkdownSegment[] {
 }
 
 export function getHeadingClass(level: number) {
-  return level === 1
-    ? "scroll-mt-8 text-2xl font-semibold text-white"
-    : level === 2
-      ? "scroll-mt-8 pt-2 text-2xl font-semibold text-white"
-      : "scroll-mt-8 text-xl font-semibold text-white";
+  switch (level) {
+    case 1:
+      return "scroll-mt-24 pt-3 text-4xl font-semibold leading-tight text-white sm:text-5xl";
+    case 2:
+      return "scroll-mt-24 pt-5 text-3xl font-semibold leading-snug text-white sm:text-4xl";
+    case 3:
+      return "scroll-mt-24 pt-4 text-2xl font-semibold leading-snug text-white sm:text-3xl";
+    case 4:
+      return "scroll-mt-24 pt-3 text-xl font-semibold leading-snug text-white sm:text-2xl";
+    case 5:
+      return "scroll-mt-24 pt-2 text-lg font-semibold leading-snug text-white/90 sm:text-xl";
+    default:
+      return "scroll-mt-24 pt-1 text-base font-semibold leading-snug text-white/76 sm:text-lg";
+  }
 }
 
 function pushMarkdownSegment(segments: MarkdownSegment[], lines: string[]) {
