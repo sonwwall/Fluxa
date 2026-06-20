@@ -20,7 +20,7 @@ export function createMarkdownComponents({
     a({ children, href, title }) {
       return (
         <a
-          className="text-sky-300 underline decoration-sky-300/45 underline-offset-4 transition hover:text-sky-200"
+          className="rounded-sm bg-sky-300/8 px-1 font-medium !text-sky-200 !underline decoration-sky-300/65 decoration-2 underline-offset-4 transition hover:bg-sky-300/14 hover:!text-sky-100"
           href={href}
           rel="noreferrer"
           target={href?.startsWith("#") ? undefined : "_blank"}
