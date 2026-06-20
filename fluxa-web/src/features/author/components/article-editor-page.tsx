@@ -46,7 +46,8 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
     scheduled: t("status.scheduled"),
   }[status];
   const canSave = Boolean(title.trim() && excerpt.trim() && content.trim() && categoryId);
-  const canPublish = canSave && status !== "published" && status !== "archived";
+  const canPublish = canSave && status !== "published";
+  const canWithdraw = status === "published" || status === "scheduled";
   const tags = tagInput
     .split(",")
     .map((tag) => tag.trim())
@@ -61,6 +62,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
     setIsSaving(true);
     setMessage(null);
     try {
+      const isNewArticle = !articleId;
       const savedId = await saveAuthorArticle(
         {
           categoryId,
@@ -73,7 +75,9 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
         articleId,
       );
       setArticleId(savedId);
-      setStatus("draft");
+      if (isNewArticle) {
+        setStatus("draft");
+      }
       setMessage(t("editor.draftSaved"));
       if (editorMode === "create") {
         setEditorMode("edit");
@@ -97,12 +101,21 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
     setIsSaving(true);
     setMessage(null);
     try {
-      const savedId =
-        articleId ?? (await saveAuthorArticle({ categoryId, content, excerpt, tags, title, visibility }));
+      const savedId = await saveAuthorArticle(
+        {
+          categoryId,
+          content,
+          excerpt,
+          tags,
+          title,
+          visibility,
+        },
+        articleId,
+      );
       setArticleId(savedId);
-      await publishAuthorArticle(savedId);
+      const result = await publishAuthorArticle(savedId);
       setEditorMode("edit");
-      setStatus("published");
+      setStatus(result.status);
       setMessage(t("editor.published"));
       if (editorMode === "create") {
         window.history.replaceState(null, "", `/author/articles/${savedId}/edit`);
@@ -120,8 +133,8 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
     setIsSaving(true);
     setMessage(null);
     try {
-      await withdrawAuthorArticle(articleId);
-      setStatus("archived");
+      const result = await withdrawAuthorArticle(articleId);
+      setStatus(result.status);
       setMessage(t("editor.withdrawn"));
       router.refresh();
     } catch (error) {
@@ -174,7 +187,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
               )}
               {articleId ? (
                 <>
-                  <Button isDisabled={isSaving || status === "archived"} onPress={handleWithdraw} variant="secondary">
+                  <Button isDisabled={isSaving || !canWithdraw} onPress={handleWithdraw} variant="secondary">
                     {t("editor.withdraw")}
                   </Button>
                   <Button isDisabled={isSaving} onPress={handleDelete} variant="secondary">

@@ -81,6 +81,11 @@ type SaveAuthorArticlePayload = {
   visibility: AuthorArticleDraft["visibility"];
 };
 
+type ArticleStatusResult = {
+  id: string;
+  status: AuthorArticleDraft["status"];
+};
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const apiBaseUrl = typeof window === "undefined" ? SERVER_API_BASE_URL : "";
   const response = await fetch(`${apiBaseUrl}${path}`, {
@@ -154,15 +159,15 @@ export async function saveAuthorArticle(
   return data.id;
 }
 
-export async function publishAuthorArticle(id: string): Promise<void> {
-  await request(`/api/v1/author/articles/${id}/publish`, {
+export async function publishAuthorArticle(id: string): Promise<ArticleStatusResult> {
+  return request<ArticleStatusResult>(`/api/v1/author/articles/${id}/publish`, {
     body: JSON.stringify({ scheduled_at: null }),
     method: "POST",
   });
 }
 
-export async function withdrawAuthorArticle(id: string): Promise<void> {
-  await request(`/api/v1/author/articles/${id}/withdraw`, {
+export async function withdrawAuthorArticle(id: string): Promise<ArticleStatusResult> {
+  return request<ArticleStatusResult>(`/api/v1/author/articles/${id}/withdraw`, {
     method: "POST",
   });
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	articleerrs "fluxa-server/internal/article/errs"
 	"fluxa-server/internal/article/model"
 	"fluxa-server/internal/article/repository"
 	articlerequest "fluxa-server/internal/article/request"
@@ -22,24 +21,26 @@ func (s *Service) PublishAuthorArticle(ctx context.Context, id string, payload *
 		if err != nil {
 			return err
 		}
-		if article.Status == model.StatusArchived {
-			return articleerrs.ErrInvalidArticleStatus
-		}
 
 		now := time.Now().UTC()
-		article.Status = status
-		article.UpdatedAt = now
-		if payload.ScheduledAt != nil {
-			article.ScheduledAt = payload.ScheduledAt
-			article.PublishedAt = nil
-		} else {
-			article.ScheduledAt = nil
-			article.PublishedAt = &now
-		}
+		applyPublishTransition(article, status, payload.ScheduledAt, now)
 		return repo.SaveArticle(ctx, article)
 	}); err != nil {
 		return nil, err
 	}
 
 	return &articleresponse.ArticleStatusResult{ID: id, Status: status}, nil
+}
+
+func applyPublishTransition(article *model.Article, status string, scheduledAt *time.Time, now time.Time) {
+	article.Status = status
+	article.UpdatedAt = now
+	if scheduledAt != nil {
+		article.ScheduledAt = scheduledAt
+		article.PublishedAt = nil
+		return
+	}
+
+	article.ScheduledAt = nil
+	article.PublishedAt = &now
 }

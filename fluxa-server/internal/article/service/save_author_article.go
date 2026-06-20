@@ -63,9 +63,6 @@ func (s *Service) UpdateAuthorArticle(ctx context.Context, id string, payload *a
 		if err != nil {
 			return err
 		}
-		if article.Status == model.StatusArchived {
-			return articleerrs.ErrInvalidArticleStatus
-		}
 
 		article.Title = payload.Title
 		article.Excerpt = payload.Excerpt
