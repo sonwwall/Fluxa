@@ -3,6 +3,7 @@
 import { Button, Input } from "@heroui/react";
 import Link from "next/link";
 
+import { FluxaBrand } from "@/components/ui/fluxa-brand";
 import { useI18n } from "@/features/i18n/i18n";
 
 type AdminShellProps = {
@@ -35,11 +36,8 @@ export function AdminShell({
       <div className="flex">
         <aside className="sticky top-0 hidden h-screen w-72 shrink-0 border-r border-white/10 bg-[#060d1a] p-5 lg:block">
           <Link className="mb-8 flex items-center gap-3" href="/author">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-sky-400/15 text-sky-100">
-              F
-            </div>
             <div>
-              <p className="text-lg font-semibold">Fluxa</p>
+              <FluxaBrand markClassName="h-10 w-10" textClassName="text-xl" />
               <p className="text-xs text-white/40">{t("author.studio")}</p>
             </div>
           </Link>
