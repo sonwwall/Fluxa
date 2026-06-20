@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 
+import { useI18n } from "@/features/i18n/i18n";
+
 type MarkdownCodeBlockProps = {
   code: string;
   html?: string;
 };
 
 export function MarkdownCodeBlock({ code, html }: MarkdownCodeBlockProps) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -36,10 +39,10 @@ export function MarkdownCodeBlock({ code, html }: MarkdownCodeBlockProps) {
   return (
     <div className="markdown-code-block group relative overflow-hidden rounded-xl border border-sky-200/25 bg-[#151c2e] text-[calc(0.875rem*var(--article-font-scale,1))]">
       <button
-        aria-label={copied ? "Code copied" : "Copy code"}
+        aria-label={copied ? t("code.copied") : t("code.copy")}
         className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-md border border-white/10 bg-[#0d1424]/90 text-white/58 shadow-sm backdrop-blur transition hover:border-sky-200/35 hover:text-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-300/55"
         onClick={copyCode}
-        title={copied ? "Code copied" : "Copy code"}
+        title={copied ? t("code.copied") : t("code.copy")}
         type="button"
       >
         {copied ? <CheckIcon /> : <ClipboardIcon />}

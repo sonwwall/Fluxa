@@ -1,4 +1,5 @@
 import type { ArticleSummary } from "../types";
+import { LocalizedText } from "@/features/i18n/i18n";
 import { ArticleCard } from "./article-card";
 import { TopNavigation } from "./top-navigation";
 
@@ -38,10 +39,10 @@ function TimelineIntro() {
   return (
     <header className="px-2 py-8 md:min-h-[220px] md:px-5 md:py-10">
       <span className="inline-flex rounded-full bg-sky-400/12 px-3 py-1 text-sm text-sky-100">
-        Thoughts, experiments, and shipping in public.
+        <LocalizedText k="articles.intro" />
       </span>
       <h1 className="mt-6 text-6xl font-semibold leading-none tracking-tight sm:text-7xl">
-        Articles
+        <LocalizedText k="articles" />
       </h1>
       <p className="mt-5 max-w-md text-base leading-7 text-white/58">
         A chronological journey of ideas on code, systems, AI, and building

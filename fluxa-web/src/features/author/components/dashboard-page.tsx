@@ -1,8 +1,10 @@
 import Link from "next/link";
 
+import { LocalizedText } from "@/features/i18n/i18n";
+
 import type { AuthorDashboardData, AuthorDashboardStat } from "../types";
 import { AdminShell } from "./admin-shell";
-import { formatAdminDate, getStatusClass, getStatusLabel } from "./format";
+import { formatAdminDate, getStatusClass } from "./format";
 
 type DashboardPageProps = {
   data: AuthorDashboardData;
@@ -23,24 +25,24 @@ export function DashboardPage({ data }: DashboardPageProps) {
           <section className="rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(30,64,175,0.28),rgba(8,13,28,0.98))] p-6 shadow-[0_22px_80px_rgba(0,0,0,0.34)]">
             <p className="text-sm text-sky-100/78">{data.summary.greeting}</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              Keep writing. The system is ready.
+              <LocalizedText k="dashboard.hero" />
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/58">
-              {data.summary.publishedThisMonth} published this month,{" "}
-              {data.summary.pendingDrafts} drafts waiting for your next pass.
+              {data.summary.publishedThisMonth} <LocalizedText k="dashboard.publishedThisMonth" />,{" "}
+              {data.summary.pendingDrafts} <LocalizedText k="dashboard.draftsWaiting" />.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 className="rounded-lg bg-sky-400 px-4 py-2 text-sm font-medium text-slate-950 shadow-[0_0_28px_rgba(56,189,248,0.32)]"
                 href="/author/articles/new"
               >
-                New article
+                <LocalizedText k="articles.new" />
               </Link>
               <Link
                 className="rounded-lg border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-white/70"
                 href="/author/articles"
               >
-                Manage articles
+                <LocalizedText k="articles.manageAction" />
               </Link>
             </div>
           </section>
@@ -58,9 +60,9 @@ export function DashboardPage({ data }: DashboardPageProps) {
 
           <section className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-xl font-semibold">Recent articles</h2>
+              <h2 className="text-xl font-semibold"><LocalizedText k="articles.recent" /></h2>
               <Link className="text-sm text-sky-200" href="/author/articles">
-                View all
+                <LocalizedText k="articles.viewAll" />
               </Link>
             </div>
             <div className="mt-5 space-y-3">
@@ -76,7 +78,7 @@ export function DashboardPage({ data }: DashboardPageProps) {
                   </div>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-white/46 md:justify-end">
                     <span className={`rounded-full px-2.5 py-1 text-xs ${getStatusClass(article.status)}`}>
-                      {getStatusLabel(article.status)}
+                      <LocalizedStatus status={article.status} />
                     </span>
                     <span>{formatAdminDate(article.publishedAt ?? article.updatedAt)}</span>
                   </div>
@@ -88,7 +90,7 @@ export function DashboardPage({ data }: DashboardPageProps) {
 
         <aside className="flex flex-col gap-5">
           <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-            <h2 className="text-lg font-semibold">Traffic shape</h2>
+            <h2 className="text-lg font-semibold"><LocalizedText k="traffic" /></h2>
             <div className="mt-5 flex h-44 items-end gap-2">
               {data.chartPoints.map((point, index) => (
                 <div
@@ -100,7 +102,7 @@ export function DashboardPage({ data }: DashboardPageProps) {
             </div>
           </section>
           <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-            <h2 className="text-lg font-semibold">Ready routes</h2>
+            <h2 className="text-lg font-semibold"><LocalizedText k="readyRoutes" /></h2>
             <div className="mt-4 space-y-3 text-sm text-white/56">
               <p>/author</p>
               <p>/author/articles</p>
@@ -112,4 +114,15 @@ export function DashboardPage({ data }: DashboardPageProps) {
       </div>
     </AdminShell>
   );
+}
+
+function LocalizedStatus({ status }: { status: "archived" | "draft" | "published" | "scheduled" }) {
+  const keyByStatus = {
+    archived: "status.archived",
+    draft: "status.draft",
+    published: "status.published",
+    scheduled: "status.scheduled",
+  } as const;
+
+  return <LocalizedText k={keyByStatus[status]} />;
 }

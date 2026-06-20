@@ -2,6 +2,9 @@
 
 import { Button, Card, Chip, Tabs } from "@heroui/react";
 import Link from "next/link";
+import type { ReactNode } from "react";
+
+import { useI18n } from "@/features/i18n/i18n";
 
 import type { ArticleHomeData } from "../types";
 import { formatArticleDate } from "./format";
@@ -30,11 +33,13 @@ export function BlogHome({ data }: BlogHomeProps) {
 }
 
 function BlogHero({ featuredSlug, topics }: { featuredSlug: string; topics: string[] }) {
+  const { t } = useI18n();
+
   return (
     <section className="grid min-h-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(11,18,35,0.96),rgba(6,9,19,0.98))] p-5 shadow-[0_22px_80px_rgba(0,0,0,0.38)] lg:grid-cols-[1fr_360px] lg:p-8">
       <div className="flex flex-col justify-center gap-6">
         <Chip className="w-fit bg-white/[0.06] text-sky-200">
-          Thoughts, experiments, and shipping in public.
+          {t("articles.intro")}
         </Chip>
         <div className="space-y-4">
           <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
@@ -52,11 +57,11 @@ function BlogHero({ featuredSlug, topics }: { featuredSlug: string; topics: stri
         <div className="flex flex-wrap gap-3">
           <Link href={`/articles/${featuredSlug}`}>
             <Button className="shadow-[0_0_28px_rgba(68,150,255,0.45)]" variant="primary">
-              Read latest
+              {t("read.latest")}
             </Button>
           </Link>
           <Link href="/articles">
-            <Button variant="secondary">Browse articles</Button>
+            <Button variant="secondary">{t("articles.browse")}</Button>
           </Link>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -165,6 +170,8 @@ function ArticleGrid({ articles }: { articles: ArticleHomeData["latest"] }) {
 }
 
 function ProfileSidebar({ articleCount }: { articleCount: number }) {
+  const { t } = useI18n();
+
   return (
     <aside className="flex flex-col gap-5">
       <Card className="border-white/10 bg-white/[0.045] p-5 shadow-[0_20px_70px_rgba(0,0,0,0.32)]">
@@ -182,26 +189,26 @@ function ProfileSidebar({ articleCount }: { articleCount: number }) {
           tools, and the craft of shipping.
         </p>
         <div className="mt-5 grid grid-cols-3 text-center">
-          <Metric label="Articles" value={String(articleCount)} />
-          <Metric label="Sections" value="4" />
-          <Metric label="Public" value="100%" />
+          <Metric label={t("articles")} value={String(articleCount)} />
+          <Metric label={t("sections")} value="4" />
+          <Metric label={t("public")} value="100%" />
         </div>
       </Card>
 
       <Card className="border-white/10 bg-white/[0.045] p-5">
-        <h2 className="text-lg font-semibold text-white">Stay in the loop</h2>
+        <h2 className="text-lg font-semibold text-white">{t("newsletter.title")}</h2>
         <p className="mt-2 text-sm leading-6 text-white/55">
-          Occasional notes on systems, frontend craft, and product engineering.
+          {t("newsletter.description")}
         </p>
         <div className="mt-4 flex gap-2">
           <input
-            aria-label="Email address"
+            aria-label={t("email")}
             className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/50"
             disabled
             placeholder="you@example.com"
           />
           <Button isDisabled variant="primary">
-            Subscribe
+            {t("subscribe")}
           </Button>
         </div>
       </Card>
@@ -209,7 +216,7 @@ function ProfileSidebar({ articleCount }: { articleCount: number }) {
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value }: { label: ReactNode; value: string }) {
   return (
     <div>
       <p className="text-xl font-semibold text-sky-300">{value}</p>

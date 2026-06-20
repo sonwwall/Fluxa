@@ -3,6 +3,8 @@
 import { Button, Input } from "@heroui/react";
 import Link from "next/link";
 
+import { useI18n } from "@/features/i18n/i18n";
+
 type AdminShellProps = {
   active: "Articles" | "Dashboard";
   breadcrumb?: string[];
@@ -26,6 +28,8 @@ export function AdminShell({
   children,
   searchPlaceholder = "Search...",
 }: AdminShellProps) {
+  const { t } = useI18n();
+
   return (
     <main className="dark min-h-screen bg-[#040b18] text-white">
       <div className="flex">
@@ -36,7 +40,7 @@ export function AdminShell({
             </div>
             <div>
               <p className="text-lg font-semibold">Fluxa</p>
-              <p className="text-xs text-white/40">Author studio</p>
+              <p className="text-xs text-white/40">{t("author.studio")}</p>
             </div>
           </Link>
           <nav className="space-y-2">
@@ -52,7 +56,7 @@ export function AdminShell({
                   key={item.label}
                 >
                   <span>{item.icon}</span>
-                  {item.label}
+                  {translateAdminLabel(item.label, t)}
                 </Link>
               ) : (
                 <button
@@ -62,7 +66,7 @@ export function AdminShell({
                   type="button"
                 >
                   <span>{item.icon}</span>
-                  {item.label}
+                  {translateAdminLabel(item.label, t)}
                 </button>
               ),
             )}
@@ -73,20 +77,22 @@ export function AdminShell({
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.16em] text-white/36">
-                  {breadcrumb.join(" / ")}
+                  {breadcrumb.map((item) => translateAdminLabel(item, t)).join(" / ")}
                 </p>
-                <h1 className="mt-1 text-2xl font-semibold">{breadcrumb.at(-1)}</h1>
+                <h1 className="mt-1 text-2xl font-semibold">
+                  {translateAdminLabel(breadcrumb.at(-1) ?? "", t)}
+                </h1>
               </div>
               <div className="flex min-w-0 items-center gap-3 md:w-[420px]">
                 <Input
-                  aria-label={searchPlaceholder}
+                  aria-label={translateAdminLabel(searchPlaceholder, t)}
                   className="min-w-0 flex-1"
                   disabled
-                  placeholder={searchPlaceholder}
+                  placeholder={translateAdminLabel(searchPlaceholder, t)}
                 />
                 <Link href="/">
                   <Button size="sm" variant="secondary">
-                    View site
+                    {t("viewSite")}
                   </Button>
                 </Link>
               </div>
@@ -97,4 +103,23 @@ export function AdminShell({
       </div>
     </main>
   );
+}
+
+function translateAdminLabel(label: string, t: ReturnType<typeof useI18n>["t"]) {
+  const labels: Record<string, ReturnType<typeof useI18n>["t"] extends (key: infer K) => string ? K & string : never> = {
+    Articles: "articles",
+    Comments: "comments",
+    Dashboard: "dashboard",
+    "Edit Article": "editor.edit",
+    Media: "media",
+    "New Article": "editor.new",
+    Pages: "pages",
+    Profile: "profile",
+    "Search...": "search.generic",
+    "Search articles...": "search",
+    Settings: "settings",
+  };
+  const key = labels[label];
+
+  return key ? t(key) : label;
 }

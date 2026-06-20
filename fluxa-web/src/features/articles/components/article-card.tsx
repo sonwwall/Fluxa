@@ -3,6 +3,8 @@
 import { Button, Card, Chip } from "@heroui/react";
 import Link from "next/link";
 
+import { useI18n } from "@/features/i18n/i18n";
+
 import type { ArticleSummary } from "../types";
 import { formatArticleDate } from "./format";
 
@@ -19,6 +21,7 @@ const accentClasses: Record<ArticleSummary["accent"], string> = {
 };
 
 export function ArticleCard({ article, imagePosition = "right" }: ArticleCardProps) {
+  const { t } = useI18n();
   const imageOrder = imagePosition === "left" ? "md:order-1" : "md:order-2";
   const contentOrder = imagePosition === "left" ? "md:order-2" : "md:order-1";
   const gridColumns =
@@ -59,7 +62,7 @@ export function ArticleCard({ article, imagePosition = "right" }: ArticleCardPro
               ))}
             </div>
             <Link href={`/articles/${article.slug}`}>
-              <Button aria-label={`Read ${article.title}`} isIconOnly size="sm" variant="secondary">
+              <Button aria-label={`${t("read.article")} ${article.title}`} isIconOnly size="sm" variant="secondary">
                 →
               </Button>
             </Link>

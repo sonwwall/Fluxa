@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { LocalizedText } from "@/features/i18n/i18n";
+
 import type { ArticleDetail, ArticleSummary } from "../types";
 import { ArticleReadingFontControls } from "./article-reading-font-controls";
 import { ArticleTocClient, type TocTreeItem } from "./article-toc-client";
@@ -41,11 +43,11 @@ function ArticleDetailHeader({ article }: { article: ArticleDetail }) {
     <header className="space-y-5">
       <nav className="flex flex-wrap items-center gap-3 text-sm text-white/52">
         <Link className="hover:text-white/80" href="/">
-          Home
+          <LocalizedText k="home" />
         </Link>
         <span>/</span>
         <Link className="hover:text-white/80" href="/articles">
-          Articles
+          <LocalizedText k="articles" />
         </Link>
         <span>/</span>
         <span>{article.category}</span>
@@ -96,7 +98,7 @@ function ArticleRelated({ articles }: { articles: ArticleSummary[] }) {
             className="border-b border-white/10 p-4 transition hover:bg-white/[0.04] md:border-b-0 md:border-r"
             href={`/articles/${previousArticle.slug}`}
           >
-            <p className="text-sm text-white/42">Previous article</p>
+            <p className="text-sm text-white/42"><LocalizedText k="previous.article" /></p>
             <p className="font-medium">{previousArticle.title}</p>
           </Link>
         ) : null}
@@ -105,12 +107,12 @@ function ArticleRelated({ articles }: { articles: ArticleSummary[] }) {
             className="p-4 text-right transition hover:bg-white/[0.04]"
             href={`/articles/${nextArticle.slug}`}
           >
-            <p className="text-sm text-white/42">Next article</p>
+            <p className="text-sm text-white/42"><LocalizedText k="next.article" /></p>
             <p className="font-medium">{nextArticle.title}</p>
           </Link>
         ) : null}
       </div>
-      <h2 className="text-lg font-semibold">Related articles</h2>
+      <h2 className="text-lg font-semibold"><LocalizedText k="articles.related" /></h2>
       <div className="grid gap-3 md:grid-cols-3">
         {[previousArticle, nextArticle, ...moreArticles].filter(Boolean).map((article, index) => (
           <Link href={`/articles/${article.slug}`} key={article.slug}>
@@ -145,7 +147,7 @@ function ArticleToc({ article }: { article: ArticleDetail }) {
 
   return (
     <aside className="sticky top-5 hidden max-h-[calc(100vh-2.5rem)] self-start overflow-hidden rounded-lg border border-white/10 bg-white/[0.035] p-7 xl:block">
-      <h2 className="text-lg font-semibold">Contents</h2>
+      <h2 className="text-lg font-semibold"><LocalizedText k="content" /></h2>
       <ArticleTocClient items={tocTree} />
     </aside>
   );

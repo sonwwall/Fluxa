@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { MarkdownPreview } from "@/features/articles/components/markdown-preview";
+import { useI18n } from "@/features/i18n/i18n";
 
 import {
   deleteAuthorArticle,
@@ -22,6 +23,7 @@ type ArticleEditorPageProps = {
 };
 
 export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPageProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const [title, setTitle] = useState(draft.title);
   const [excerpt, setExcerpt] = useState(draft.excerpt);
@@ -36,6 +38,13 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
   const [message, setMessage] = useState<string | null>(null);
 
   const titleLabel = editorMode === "create" ? "New Article" : "Edit Article";
+  const localizedTitleLabel = editorMode === "create" ? t("editor.new") : t("editor.edit");
+  const statusLabel = {
+    archived: t("status.archived"),
+    draft: t("status.draft"),
+    published: t("status.published"),
+    scheduled: t("status.scheduled"),
+  }[status];
   const canSave = Boolean(title.trim() && excerpt.trim() && content.trim() && categoryId);
   const canPublish = canSave && status !== "published" && status !== "archived";
   const tags = tagInput
@@ -45,7 +54,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
 
   async function handleSave() {
     if (!canSave) {
-      setMessage("Please complete title, excerpt, content, and category.");
+      setMessage(t("editor.completeRequired"));
       return;
     }
 
@@ -65,7 +74,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
       );
       setArticleId(savedId);
       setStatus("draft");
-      setMessage("Draft saved.");
+      setMessage(t("editor.draftSaved"));
       if (editorMode === "create") {
         setEditorMode("edit");
         router.replace(`/author/articles/${savedId}/edit`);
@@ -73,7 +82,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
         router.refresh();
       }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Save failed.");
+      setMessage(error instanceof Error ? error.message : t("editor.saveFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -81,7 +90,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
 
   async function handlePublish() {
     if (!canPublish) {
-      setMessage("Please complete title, excerpt, content, and category before publishing.");
+      setMessage(t("editor.completeBeforePublish"));
       return;
     }
 
@@ -94,12 +103,12 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
       await publishAuthorArticle(savedId);
       setEditorMode("edit");
       setStatus("published");
-      setMessage("Article published.");
+      setMessage(t("editor.published"));
       if (editorMode === "create") {
         window.history.replaceState(null, "", `/author/articles/${savedId}/edit`);
       }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Publish failed.");
+      setMessage(error instanceof Error ? error.message : t("editor.publishFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -113,10 +122,10 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
     try {
       await withdrawAuthorArticle(articleId);
       setStatus("archived");
-      setMessage("Article withdrawn.");
+      setMessage(t("editor.withdrawn"));
       router.refresh();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Withdraw failed.");
+      setMessage(error instanceof Error ? error.message : t("editor.withdrawFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -132,7 +141,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
       router.replace("/author/articles");
       router.refresh();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Delete failed.");
+      setMessage(error instanceof Error ? error.message : t("editor.deleteFailed"));
       setIsSaving(false);
     }
   }
@@ -147,29 +156,29 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
         <div className="flex min-w-0 flex-col gap-5">
           <section className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-sm text-sky-200">{status}</p>
-              <h2 className="mt-1 text-2xl font-semibold">{titleLabel}</h2>
+              <p className="text-sm text-sky-200">{statusLabel}</p>
+              <h2 className="mt-1 text-2xl font-semibold">{localizedTitleLabel}</h2>
             </div>
             <div className="flex flex-wrap gap-3">
               <Button isDisabled={isSaving || !canSave} onPress={handleSave} variant="secondary">
-                {isSaving ? "Saving..." : "Save draft"}
+                {isSaving ? t("editor.saving") : t("editor.saveDraft")}
               </Button>
               {status === "published" ? (
                 <Button isDisabled variant="secondary">
-                  Published
+                  {t("status.published")}
                 </Button>
               ) : (
                 <Button isDisabled={isSaving || !canPublish} onPress={handlePublish} variant="primary">
-                  {isSaving ? "Publishing..." : "Publish"}
+                  {isSaving ? t("editor.publishing") : t("publish")}
                 </Button>
               )}
               {articleId ? (
                 <>
                   <Button isDisabled={isSaving || status === "archived"} onPress={handleWithdraw} variant="secondary">
-                    Withdraw
+                    {t("editor.withdraw")}
                   </Button>
                   <Button isDisabled={isSaving} onPress={handleDelete} variant="secondary">
-                    Delete
+                    {t("editor.delete")}
                   </Button>
                 </>
               ) : null}
@@ -183,16 +192,16 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
 
           <section className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5 md:grid-cols-2">
             <label className="flex flex-col gap-2 text-sm text-white/70">
-              Title
+              {t("editor.title")}
               <input
                 className="h-10 rounded-lg border border-white/10 bg-[#081120] px-3 text-sm text-white outline-none focus:border-sky-300/40"
                 onChange={(event) => setTitle(event.target.value)}
-                placeholder="Article title"
+                placeholder={t("editor.titlePlaceholder")}
                 value={title}
               />
             </label>
             <label className="flex flex-col gap-2 text-sm text-white/70">
-              Category
+              {t("category")}
               <select
                 className="h-10 rounded-lg border border-white/10 bg-[#081120] px-3 text-sm text-white"
                 onChange={(event) => setCategoryId(event.target.value)}
@@ -206,7 +215,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
               </select>
             </label>
             <label className="flex flex-col gap-2 text-sm text-white/70">
-              Tags
+              {t("editor.tags")}
               <input
                 className="h-10 rounded-lg border border-white/10 bg-[#081120] px-3 text-sm text-white outline-none focus:border-sky-300/40"
                 onChange={(event) => setTagInput(event.target.value)}
@@ -215,7 +224,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
               />
             </label>
             <label className="flex flex-col gap-2 text-sm text-white/70">
-              Visibility
+              {t("editor.visibility")}
               <select
                 className="h-10 rounded-lg border border-white/10 bg-[#081120] px-3 text-sm text-white"
                 onChange={(event) =>
@@ -223,18 +232,18 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
                 }
                 value={visibility}
               >
-                <option value="inherit">Inherit category</option>
-                <option value="public">Public</option>
-                <option value="registered">Registered users</option>
+                <option value="inherit">{t("visibility.inherit")}</option>
+                <option value="public">{t("public")}</option>
+                <option value="registered">{t("visibility.registered")}</option>
               </select>
             </label>
             <div className="md:col-span-2">
               <label className="flex flex-col gap-2 text-sm text-white/70">
-                Excerpt
+                {t("editor.excerpt")}
                 <textarea
                   className="min-h-24 rounded-lg border border-white/10 bg-[#081120] px-3 py-2 text-sm text-white outline-none focus:border-sky-300/40"
                   onChange={(event) => setExcerpt(event.target.value)}
-                  placeholder="Short summary"
+                  placeholder={t("editor.excerptPlaceholder")}
                   value={excerpt}
                 />
               </label>
@@ -243,7 +252,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
 
           <section className="grid gap-5 xl:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <h3 className="text-lg font-semibold">Markdown</h3>
+              <h3 className="text-lg font-semibold">{t("markdown")}</h3>
               <textarea
                 className="mt-4 min-h-[520px] w-full resize-y rounded-xl border border-white/10 bg-[#07101f] p-4 font-mono text-sm leading-6 text-white outline-none focus:border-sky-300/40"
                 onChange={(event) => setContent(event.target.value)}
@@ -251,7 +260,7 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
               />
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <h3 className="text-lg font-semibold">Preview</h3>
+              <h3 className="text-lg font-semibold">{t("preview")}</h3>
               <MarkdownPreview
                 className="mt-4 min-h-[520px] space-y-6 rounded-xl border border-white/10 bg-[#07101f] p-5 text-[15px] leading-7 text-white/72"
                 content={content}
@@ -262,18 +271,18 @@ export function ArticleEditorPage({ categories, draft, mode }: ArticleEditorPage
 
         <aside className="flex flex-col gap-5">
           <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-            <h3 className="text-lg font-semibold">Publish checklist</h3>
+            <h3 className="text-lg font-semibold">{t("editor.checklist")}</h3>
             <div className="mt-4 space-y-3 text-sm text-white/56">
-              <p>{title ? "✓" : "○"} Title</p>
-              <p>{excerpt ? "✓" : "○"} Excerpt</p>
-              <p>{content.length > 80 ? "✓" : "○"} Content</p>
-              <p>{categoryId ? "✓" : "○"} Category</p>
+              <p>{title ? "✓" : "○"} {t("editor.title")}</p>
+              <p>{excerpt ? "✓" : "○"} {t("editor.excerpt")}</p>
+              <p>{content.length > 80 ? "✓" : "○"} {t("content")}</p>
+              <p>{categoryId ? "✓" : "○"} {t("category")}</p>
             </div>
           </section>
           <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-            <h3 className="text-lg font-semibold">Publishing</h3>
+            <h3 className="text-lg font-semibold">{t("editor.publishingTitle")}</h3>
             <p className="mt-3 text-sm leading-6 text-white/52">
-              Changes are saved through the author service and reflected in the public blog after publish.
+              {t("editor.publishingDescription")}
             </p>
           </section>
         </aside>

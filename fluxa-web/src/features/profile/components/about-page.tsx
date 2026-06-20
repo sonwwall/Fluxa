@@ -1,5 +1,7 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
+import { LocalizedText } from "@/features/i18n/i18n";
 import { TopNavigation } from "@/features/articles/components/top-navigation";
 
 import type { AuthorProfile, ProfileNowItem } from "../types";
@@ -36,7 +38,7 @@ function AboutHero({ profile }: AboutPageProps) {
     <section className="grid min-h-[460px] items-end gap-8 rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(10,17,34,0.94),rgba(5,10,22,0.98))] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.42)] lg:grid-cols-[minmax(0,1fr)_360px] lg:p-9">
       <div className="space-y-7">
         <span className="inline-flex rounded-full bg-sky-400/12 px-3 py-1 text-sm text-sky-100">
-          About the author
+          <LocalizedText k="about.author" />
         </span>
         <div className="space-y-4">
           <h1 className="max-w-4xl text-5xl font-semibold leading-none tracking-tight sm:text-6xl lg:text-7xl">
@@ -60,7 +62,7 @@ function AboutHero({ profile }: AboutPageProps) {
       <div className="relative hidden min-h-80 lg:block">
         <div className="absolute inset-0 rounded-[32px] border border-sky-200/20 bg-[radial-gradient(circle_at_50%_20%,rgba(56,189,248,0.22),transparent_38%),linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))]" />
         <div className="absolute bottom-8 left-8 right-8 rounded-2xl border border-white/10 bg-black/24 p-5 backdrop-blur">
-          <p className="text-sm text-white/42">Currently in</p>
+          <p className="text-sm text-white/42"><LocalizedText k="currentlyIn" /></p>
           <p className="mt-1 text-xl font-semibold">{profile.location}</p>
         </div>
       </div>
@@ -89,7 +91,7 @@ function NowSection({ profile }: AboutPageProps) {
 function SkillsSection({ profile }: AboutPageProps) {
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.035] p-6">
-      <SectionTitle label="Skills" title="Tools I reach for" />
+      <SectionTitle label={<LocalizedText k="skills" />} title={<LocalizedText k="skills.title" />} />
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         {profile.skills.map((group) => (
           <div className="rounded-xl border border-white/10 bg-[#091120] p-5" key={group.group}>
@@ -111,7 +113,7 @@ function SkillsSection({ profile }: AboutPageProps) {
 function JourneySection({ profile }: AboutPageProps) {
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.035] p-6">
-      <SectionTitle label="Journey" title="How the path is unfolding" />
+      <SectionTitle label={<LocalizedText k="journey" />} title={<LocalizedText k="journey.title" />} />
       <div className="mt-6 space-y-4">
         {profile.journey.map((item) => (
           <article className="grid gap-3 rounded-xl border border-white/10 bg-[#08101f] p-5 md:grid-cols-[140px_1fr]" key={item.period}>
@@ -140,7 +142,7 @@ function PrinciplesSection({ profile }: AboutPageProps) {
   );
 }
 
-function SectionTitle({ label, title }: { label: string; title: string }) {
+function SectionTitle({ label, title }: { label: ReactNode; title: ReactNode }) {
   return (
     <header>
       <p className="text-xs uppercase tracking-[0.18em] text-sky-200/72">{label}</p>

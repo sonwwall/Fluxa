@@ -3,13 +3,15 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useState } from "react";
 
+import { useI18n } from "@/features/i18n/i18n";
+
 const STORAGE_KEY = "fluxa.articleFontScale";
 
 const FONT_SIZES = [
-  { label: "小号", scale: 0.8 },
-  { label: "紧凑", scale: 0.9 },
-  { label: "标准", scale: 1 },
-  { label: "宽松", scale: 1.1 },
+  { key: "font.small", scale: 0.8 },
+  { key: "font.compact", scale: 0.9 },
+  { key: "font.standard", scale: 1 },
+  { key: "font.loose", scale: 1.1 },
 ] as const;
 
 type ArticleReadingFontControlsProps = {
@@ -17,6 +19,7 @@ type ArticleReadingFontControlsProps = {
 };
 
 export function ArticleReadingFontControls({ children }: ArticleReadingFontControlsProps) {
+  const { t } = useI18n();
   const [fontScale, setFontScale] = useState(1);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
@@ -46,7 +49,7 @@ export function ArticleReadingFontControls({ children }: ArticleReadingFontContr
             <div className="mb-2 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-medium text-white/86">
                 <FontSizeIcon />
-                <span>字号</span>
+                <span>{t("font.size")}</span>
               </div>
               <span className="text-xs text-white/42">{Math.round(fontScale * 100)}%</span>
             </div>
@@ -66,7 +69,7 @@ export function ArticleReadingFontControls({ children }: ArticleReadingFontContr
                     onClick={() => selectFontScale(item.scale)}
                     type="button"
                   >
-                    {item.label}
+                    {t(item.key)}
                   </button>
                 );
               })}
@@ -75,13 +78,13 @@ export function ArticleReadingFontControls({ children }: ArticleReadingFontContr
         ) : null}
         <button
           aria-expanded={isPanelOpen}
-          aria-label={isPanelOpen ? "收起字号设置" : "展开字号设置"}
+          aria-label={isPanelOpen ? t("font.collapse") : t("font.expand")}
           className="grid h-11 w-11 place-items-center rounded-l-lg border border-r-0 border-white/12 bg-[#07101f]/94 text-sky-200 shadow-[0_12px_36px_rgba(0,0,0,0.32)] backdrop-blur-md transition hover:border-sky-200/35 hover:text-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-300/55"
           onClick={() => setIsPanelOpen((value) => !value)}
-          title={isPanelOpen ? "收起字号设置" : "展开字号设置"}
+          title={isPanelOpen ? t("font.collapse") : t("font.expand")}
           type="button"
         >
-          <span className="sr-only">{isPanelOpen ? "收起字号设置" : "展开字号设置"}</span>
+          <span className="sr-only">{isPanelOpen ? t("font.collapse") : t("font.expand")}</span>
           <span aria-hidden="true" className="flex items-center">
             <FontSizeIcon />
           </span>
